@@ -9,7 +9,7 @@ public class Gameplay {
     int guesses = 0;
 
     private ArrayList<ShipModel> shipList = new ArrayList<>();
-    GameHelper helper = new GameHelper();
+    GameHelper helper = new GameHelper(7,7,3);
 
     private int gridWidth = 7;
     private int gridHeight = 7;
@@ -25,7 +25,7 @@ public class Gameplay {
 
         ArrayList<Integer> locations = new ArrayList<>();
         for(ShipModel ship : shipList) {
-            ArrayList<Integer> shipLocation = helper.placeShip(sizeOfShips, gridWidth, gridHeight);
+            ArrayList<Integer> shipLocation = helper.placeShip();
             System.out.println("Ship: " + shipList.indexOf(ship));
             System.out.println("Location: ");
             for(Integer i : shipLocation) {

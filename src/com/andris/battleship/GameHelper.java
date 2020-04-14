@@ -3,13 +3,21 @@ package com.andris.battleship;
 import java.util.ArrayList;
 
 public class GameHelper {
-    private int gridSize;
+    int gridWidth;
+    int gridHeight;
+    int shipSize;
     // cell value: 0 if free, 1 if taken
-    private int[] cellValues = new int[gridSize];
+    private int[] cellValues;
+
+    public GameHelper(int gridWidth, int gridHeight, int shipSize) {
+        this.gridWidth = gridWidth;
+        this.gridHeight = gridHeight;
+        this.shipSize = shipSize;
+        cellValues = new int[gridHeight*gridWidth];
+    }
 
     // place ship on grid
-    public ArrayList<Integer> placeShip(int shipSize, int gridWidth, int gridHeight) {
-        gridSize = gridWidth*gridHeight;
+    public ArrayList<Integer> placeShip() {
         // list to hold the cell values of the ship (i.e. "c1", "c2", "c3")
         ArrayList<Integer> shipCellPosition = new ArrayList<>();
         // coordinates for storing the the position of ship cells (0-48)
@@ -32,10 +40,11 @@ public class GameHelper {
 
         while ( !success & attempts++ < 200 ) {
             // get random starting point to place ship
-            location = (int) (Math.random() * gridSize);
+            location = (int) (Math.random() * (gridHeight*gridWidth));
 //            System.out.print(" try " + location);
             // ship cell number
             int x = 0;
+            System.out.println(cellValues.length);
             // assume success
             success = true;
 
@@ -48,7 +57,7 @@ public class GameHelper {
                     gridPosition[x++] = location;
                     // move to adjacent position
                     location += incrStep;
-                    if (location >= gridSize){ // if true, we are below the bottom of the grid
+                    if (location >= (gridHeight*gridWidth)){ // if true, we are below the bottom of the grid
                         success = false;
                     }
                     if (x>0 && (location % gridWidth == 0)) {  // went over the right edge, valid right edge locations are n*7-1

@@ -74,8 +74,10 @@ public class Battleship implements Game {
         battlefieldValues = new ArrayList<>();
         ArrayList<Integer> locations = game.startGame(); // startGame() places ships on the battlefield
         for (Integer i = 0; i < 49; i++) { // list should be parametrized!!! not hard-coded 49 buttons
-            JButton b = new JButton(Integer.toString(i));
+            JButton b = new JButton();
+            b.setBorder(BorderFactory.createBevelBorder(0));
             b.addActionListener(buttonListener);
+            b.setBackground(Color.WHITE);
             b.setPreferredSize(new Dimension(50, 50));
             battlefieldCells.add(b);
             if(locations.contains(i)) {
@@ -150,7 +152,11 @@ public class Battleship implements Game {
 
                     battlefieldPanel.remove(index);
                     if(battlefieldValues.get(index)) {
-                        battlefieldPanel.add(new JButton("X"),index);
+                        JButton b = new JButton("X");
+                        b.setBorder(BorderFactory.createBevelBorder(1));
+                        b.setBackground(Color.RED);
+                        b.setOpaque(true);
+                        battlefieldPanel.add(b, index);
                     } else {
                         battlefieldPanel.add(new JPanel(),index);
                     }
@@ -196,7 +202,11 @@ public class Battleship implements Game {
                     int index = battlefieldCells.indexOf(button);
                     battlefieldPanel.remove(index);
                     if(battlefieldValues.get(index)) {
-                        battlefieldPanel.add(new JButton("X"),index);
+                        JButton b = new JButton("X");
+                        b.setBorder(BorderFactory.createBevelBorder(1));
+                        b.setBackground(Color.RED);
+                        b.setOpaque(true);
+                        battlefieldPanel.add(b, index);
                     } else {
                         battlefieldPanel.add(new JPanel(),index);
                     }

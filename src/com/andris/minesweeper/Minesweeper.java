@@ -26,7 +26,8 @@ public class Minesweeper implements Game {
     Box messageBox;
     JLabel messageLabel;
 
-    boolean flagged = false;
+    int bombCounter;
+    int clicks;
 
     @Override
     public String getGameName() {
@@ -70,6 +71,8 @@ public class Minesweeper implements Game {
     /*** set up gameField ***/
     private void makeGameField() {
         game = new Gameplay();
+        bombCounter = 0;
+        clicks = 0;
         gameFieldCells = new ArrayList<>();
         gameFieldValues = new ArrayList<>();
         ArrayList<Integer> locations = game.startGame(); // startGame() places ships on the battlefield
@@ -150,6 +153,17 @@ public class Minesweeper implements Game {
         rightPanel.add(BorderLayout.SOUTH, messageBox);
     }
 
+    public void refreshMessages(String message) {
+        messageBox.removeAll();
+
+        messageBox.add(new JLabel(message));
+
+        messageBox.validate();
+        messageBox.repaint();
+        rightPanel.validate();
+        rightPanel.repaint();
+    }
+
     /*** ACTION: button clicked on battlefield ***/
     public class ButtonListener implements MouseListener {
         @Override
@@ -175,6 +189,9 @@ public class Minesweeper implements Game {
                             b.setBackground(Color.GREEN);
                             b.setOpaque(true);
                             b.setSelected(true);
+                            bombCounter++;
+                            message = "Bombs remaining: " + String.valueOf(5-bombCounter);
+                            refreshMessages(message);
                             gameFieldPanel.add(b, (int) index);
                             gameFieldPanel.validate();
                             gameFieldPanel.repaint();
@@ -184,6 +201,9 @@ public class Minesweeper implements Game {
                             b.setText("");
                             b.setBackground(Color.WHITE);
                             b.setSelected(false);
+                            bombCounter--;
+                            message = "Bombs remaining: " + String.valueOf(5-bombCounter);
+                            refreshMessages(message);
                             b.setBorder(BorderFactory.createBevelBorder(0));
                             gameFieldPanel.add(b, (int) index);
                             gameFieldPanel.validate();
@@ -195,41 +215,52 @@ public class Minesweeper implements Game {
             }
 
             if (SwingUtilities.isLeftMouseButton(e)) {
-                for(JButton button : gameFieldCells) {
-                    if(!button.isSelected()) {
-                        if (e.getSource().equals(button)) {
-                            int index = gameFieldCells.indexOf(button);
+                // if revealed buttons are fewer than fields minus bomb number continue playing
+                    for (JButton button : gameFieldCells) {
+                        if (!button.isSelected()) {
+                            if (e.getSource().equals(button)) {
+                                int index = gameFieldCells.indexOf(button);
+                                JButton b = gameFieldCells.get(index);
 
-                            if (gameFieldValues.get(index) == -1) {
-                                revealMines();
-                                gameFieldPanel.remove(index);
-                                JButton b = new JButton("X");
-                                b.setBorder(BorderFactory.createBevelBorder(1));
-                                b.setBackground(Color.RED);
-                                b.setOpaque(true);
-                                gameFieldPanel.add(b, (int) index);
-                                gameFieldPanel.validate();
-                                gameFieldPanel.repaint();
-                                // game over - reveal board
-                                // get message
-                            } else if (gameFieldValues.get(index) == 0) {
-                                // reveal adjacent buttons
-                                revealAdjacentCells(index);
-                            } else {
-                                // reveal cell value
-                                gameFieldPanel.remove(index);
-                                String s = gameFieldValues.get(index).toString();
-                                JButton b = new JButton(s);
-                                b.setBackground(Color.LIGHT_GRAY);
-                                b.setOpaque(true);
-                                b.setBorder(BorderFactory.createBevelBorder(1));
-                                gameFieldPanel.add(b, (int) index);
-                                gameFieldPanel.validate();
-                                gameFieldPanel.repaint();
+                                if (gameFieldValues.get(index) == -1) {
+                                    revealMines();
+                                    gameFieldPanel.remove(index);
+                                    b.setText("X");
+                                    b.setBorder(BorderFactory.createBevelBorder(1));
+                                    b.setBackground(Color.RED);
+                                    b.setOpaque(true);
+                                    gameFieldPanel.add(b, (int) index);
+                                    gameFieldPanel.validate();
+                                    gameFieldPanel.repaint();
+                                    message = "Game over!";
+                                    refreshMessages(message);
+                                } else if (gameFieldValues.get(index) == 0) {
+                                    // reveal adjacent buttons
+                                    revealAdjacentCells(index, b);
+                                } else {
+                                    clicks++;
+                                    System.out.println("Clicks: " + clicks);
+                                    // reveal cell value
+                                    gameFieldPanel.remove(index);
+                                    String s = gameFieldValues.get(index).toString();
+                                    gameFieldValues.set(index, -99);
+                                    b.setText(s);
+                                    b.setBackground(Color.LIGHT_GRAY);
+                                    b.setOpaque(true);
+                                    b.setBorder(BorderFactory.createBevelBorder(1));
+                                    gameFieldPanel.add(b, (int) index);
+                                    gameFieldPanel.validate();
+                                    gameFieldPanel.repaint();
+                                }
                             }
                         }
                     }
-                }
+            }
+
+            if(clicks == 49-5) {
+                message = "You win!";
+                refreshMessages(message);
+                revealMines();
             }
         }
 
@@ -245,15 +276,17 @@ public class Minesweeper implements Game {
     }
 
     /*** reveal adjacent cells ***/
-    public void revealAdjacentCells(int index) {
+    public void revealAdjacentCells(int index, JButton b) {
+        clicks++;
+        System.out.println("Clicks: " + clicks);
         // reveal this button
         gameFieldPanel.remove(index);
         String s = gameFieldValues.get(index).toString() + "+";
         gameFieldValues.set(index, -99);
-        JButton b = new JButton();
+        b = new JButton();
         b.setBackground(Color.LIGHT_GRAY);
         b.setOpaque(true);
-//        b.setBorder(BorderFactory.createBevelBorder(0));
+//        b.setBorder(BorderFactory.createBevelBorder(2));
         gameFieldPanel.add(b, index);
         gameFieldPanel.validate();
         gameFieldPanel.repaint();
@@ -265,22 +298,28 @@ public class Minesweeper implements Game {
         // invalid address x = -100
         for(Integer x : adjacentCells) {
             if(x >= 0) {
-                if(gameFieldValues.get(x) == 0) {
-                    revealAdjacentCells((int) x);
+                JButton butt = gameFieldCells.get(x);
+                if(!butt.isSelected()) {
+                    if (gameFieldValues.get(x) == 0) {
+                        revealAdjacentCells((int) x, butt);
 //                    System.out.println("Cell: " + x + " - set value to -99");
 //                    gameFieldValues.set(adjacentCells.indexOf(x), -99);
 
-                } else if (gameFieldValues.get(x) > 0){
-                    System.out.println("Location: " + x + "\t Value: " + gameFieldValues.get(x) + "\t");
-                    gameFieldPanel.remove(x);
-                    String str = gameFieldValues.get(x).toString();
-                    JButton butt = new JButton(str);
-                    butt.setBackground(Color.LIGHT_GRAY);
-                    butt.setOpaque(true);
-                    butt.setBorder(BorderFactory.createBevelBorder(1));
-                    gameFieldPanel.add(butt, (int) x);
-                    gameFieldPanel.validate();
-                    gameFieldPanel.repaint();
+                    } else if (gameFieldValues.get(x) > 0) {
+                        clicks++;
+                        System.out.println("Clicks: " + clicks);
+                        System.out.println("Location: " + x + "\t Value: " + gameFieldValues.get(x) + "\t");
+                        gameFieldPanel.remove(x);
+                        String str = gameFieldValues.get(x).toString();
+                        gameFieldValues.set(x, -99);
+                        butt.setText(str);
+                        butt.setBackground(Color.LIGHT_GRAY);
+                        butt.setOpaque(true);
+                        butt.setBorder(BorderFactory.createBevelBorder(1));
+                        gameFieldPanel.add(butt, (int) x);
+                        gameFieldPanel.validate();
+                        gameFieldPanel.repaint();
+                    }
                 }
             }
         }
