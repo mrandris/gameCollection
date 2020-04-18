@@ -32,10 +32,6 @@ public class Gameplay {
         cell = new Cell();
         cell.location = index;
         int[] adLoc = cell.calculateAdjacentLocations(7,7);
-//        System.out.println("\nAdjacent cells for cell no. " + index);
-//        for(int i=0; i<adLoc.length; i++) {
-//            System.out.print(adLoc[i] + "\t");
-//        }
         for(int i = 0; i<adLoc.length; i++) {
             adjacent.add(adLoc[i]);
         }

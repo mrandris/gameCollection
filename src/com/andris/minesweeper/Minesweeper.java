@@ -120,8 +120,8 @@ public class Minesweeper implements Game {
 
         JLabel text1 = new JLabel("Find all the mines on the field");
         JLabel text11 = new JLabel("without stepping on one!");
-        JLabel text2 = new JLabel("Size of filed: H x L");
-        JLabel text3 = new JLabel("Number of mines: 3");
+        JLabel text2 = new JLabel("Size of filed: 7 x 7");
+        JLabel text3 = new JLabel("Number of mines: 5");
 
         textBox.add(text1);
         textBox.add(text11);
@@ -239,7 +239,6 @@ public class Minesweeper implements Game {
                                     revealAdjacentCells(index, b);
                                 } else {
                                     clicks++;
-                                    System.out.println("Clicks: " + clicks);
                                     // reveal cell value
                                     gameFieldPanel.remove(index);
                                     String s = gameFieldValues.get(index).toString();
@@ -278,11 +277,10 @@ public class Minesweeper implements Game {
     /*** reveal adjacent cells ***/
     public void revealAdjacentCells(int index, JButton b) {
         clicks++;
-        System.out.println("Clicks: " + clicks);
         // reveal this button
         gameFieldPanel.remove(index);
         String s = gameFieldValues.get(index).toString() + "+";
-        gameFieldValues.set(index, -99);
+        gameFieldValues.set(index, -99); // change value - not to be iterated over again
         b = new JButton();
         b.setBackground(Color.LIGHT_GRAY);
         b.setOpaque(true);
@@ -293,25 +291,19 @@ public class Minesweeper implements Game {
 
         // get adjacent cells
         ArrayList<Integer> adjacentCells = game.playGame(index);
-        System.out.println("Index: " + index);
 
-        // invalid address x = -100
+        // invalid address x = -100 (out of grid bounds)
         for(Integer x : adjacentCells) {
             if(x >= 0) {
                 JButton butt = gameFieldCells.get(x);
                 if(!butt.isSelected()) {
                     if (gameFieldValues.get(x) == 0) {
                         revealAdjacentCells((int) x, butt);
-//                    System.out.println("Cell: " + x + " - set value to -99");
-//                    gameFieldValues.set(adjacentCells.indexOf(x), -99);
-
                     } else if (gameFieldValues.get(x) > 0) {
                         clicks++;
-                        System.out.println("Clicks: " + clicks);
-                        System.out.println("Location: " + x + "\t Value: " + gameFieldValues.get(x) + "\t");
                         gameFieldPanel.remove(x);
                         String str = gameFieldValues.get(x).toString();
-                        gameFieldValues.set(x, -99);
+                        gameFieldValues.set(x, -99); // change value - not to be iterated over again
                         butt.setText(str);
                         butt.setBackground(Color.LIGHT_GRAY);
                         butt.setOpaque(true);
@@ -323,14 +315,13 @@ public class Minesweeper implements Game {
                 }
             }
         }
-
     }
 
     /*** ACTION: reset minefield (new game) ***/
     public class ResetListener implements ActionListener {
         @Override
         public void actionPerformed(ActionEvent e) {
-            System.out.println("Reset battlefield");
+            System.out.println("Reset minefield");
             gameFieldPanel.removeAll();
             makeGameField();
             gameFieldPanel.validate();

@@ -4,7 +4,6 @@ import java.util.ArrayList;
 
 public class Cell {
     Integer location;
-    private char value;
 
     public int[] calculateAdjacentLocations(int gridWidth, int gridHeight) {
         int cellNumber = gridHeight*gridWidth - 1;

@@ -41,10 +41,8 @@ public class GameHelper {
         while ( !success & attempts++ < 200 ) {
             // get random starting point to place ship
             location = (int) (Math.random() * (gridHeight*gridWidth));
-//            System.out.print(" try " + location);
             // ship cell number
             int x = 0;
-            System.out.println(cellValues.length);
             // assume success
             success = true;
 
@@ -65,7 +63,6 @@ public class GameHelper {
                     }
                     // if location == 1, cell is already used
                 } else {
-                    System.out.print(" used " + location);
                     success = false;
                 }
             }
@@ -81,7 +78,6 @@ public class GameHelper {
             shipCellPosition.add(gridPosition[x]);
             x++;
         }
-        System.out.println("\n");
         return shipCellPosition;
     }
 }

@@ -164,7 +164,6 @@ public class Battleship implements Game {
                     battlefieldPanel.repaint();
                 }
             }
-            System.out.println(e.getModifiers());
         }
     }
 
@@ -173,7 +172,6 @@ public class Battleship implements Game {
 
         for(String message : game.playGame(index)) {
             messageBox.add(new JLabel(message));
-            System.out.println(message);
         }
 
         messageBox.validate();
@@ -186,7 +184,7 @@ public class Battleship implements Game {
     public class ResetListener implements ActionListener {
         @Override
         public void actionPerformed(ActionEvent e) {
-            System.out.println("Reset battlefield");
+            System.out.println("\nReset battlefield");
             battlefieldPanel.removeAll();
             makeBattlefield();
             battlefieldPanel.validate();

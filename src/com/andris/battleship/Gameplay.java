@@ -57,18 +57,15 @@ public class Gameplay {
         for(ShipModel ship : shipList) {
             result = ship.checkInput(userGuess);
             if(result.equals("Hit!")) {
-                System.out.println(result);
                 break;
             }
             if(result.equals("Kill!")) {
                 shipList.remove(ship);
-                System.out.println(result);
                 break;
             }
         }
 
         if(result.equals("Miss!")) {
-            System.out.println(result);
         }
         return result;
     }
